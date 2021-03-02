@@ -16,6 +16,8 @@ check.package <- function(package) requireNamespace(package, quietly = TRUE)
 setwd(file.path(.get_course_path(),"Data_management_and_basic_summaries_in_R","Data_management_and_frequent_tasks"))
 
 if(!check.package('imager')) install.packages('imager')
+if(!check.package('tidyverse')) install.packages('tidyverse')
+library(tidyverse)
 # if(!check.package('RCurl')) install.packages('RCurl')
 # if(!check.package('png')) install.packages('png')
 # if(!check.package('jpeg')) install.packages('jpeg')
@@ -41,4 +43,3 @@ ae <- read.csv('ae.csv')
 installed <- function(){
   invisible(TRUE)
 }
-

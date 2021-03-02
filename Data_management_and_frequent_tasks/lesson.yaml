@@ -16,29 +16,29 @@
 - Class: text
   Output: |
     To get data ready, there are multiple ways of combining, selecting and filtering tables using R base or R cran packages.
-    This section will lead you throught some common tasks that usually occur during data cleaning with the combination of R base and other R packages, especially `tidyverse`. 
+    This section will lead you through some common tasks that usually occur during data cleaning with the combination of R base and other R packages, especially `tidyverse`. 
 
 - Class: text
   Output: Section 1 - Separation of information
 
 - Class: text
   Output: |
-    As described from the begining, the data needs to be in the tidy format.
+    As described from the beginning, the data needs to be in the tidy format.
     
     In the `drug9NA`, the column named "DrugDose" includes combination of number and character.
     In term of further analysis calculation or selection on drugdose,
     it will cause problem since this column is now store as character rather than numeric.
-    Therefore, the separation of this into two separated collumn of DrugDose and DrugDoseParameter is needed.
+    Therefore, the separation of this into two separated column of DrugDose and DrugDoseParameter is needed.
 
 - Class: text
-  Output: Make sure that you have fininished the lesson about `tidyverse` package, because in this lesson, we will dig deeper into it.
+  Output: Make sure that you have finished the lesson about `tidyverse` package, because in this lesson, we will dig deeper into it.
 
 - Class: text
   Output: |
     `separate()` is another function from *tidyverse* package.
     
     What it does is take the column of multiple information and separate into multiple column.
-    The number of column splitted depends our information. In here, the separator needs to be clarify.
+    The number of column split depends our information. In here, the separator needs to be clarify.
     It can be "/", " %", " ",":" or any common character in all rows which can help the function know where to split the data.
 
 - Class: cmd_question
@@ -62,7 +62,7 @@
     
     First, let's look the function up within the Help section. Use the appropriate function to acquire that.
   CorrectAnswer: ?separate
-  AnswerTests: any_of_exprs('?separate','help(separate)')
+  AnswerTests: any_of_exprs('?separate','help("separate")')
   Hint: Do you know the ? function
 
 - Class: text_question
@@ -142,7 +142,7 @@
 
 - Class: text
   Output: |
-    Sometimes, catergorical variables are mistakenly recognized as character type.
+    Sometimes, categorical variables are mistakenly recognized as character type.
     You want to convert them back to being factors. 
     Sometimes, it is just to avoid potential issues that might destroy your analysis (I mean, for safety purpose.)
     
