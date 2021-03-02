@@ -1,0 +1,233 @@
+- Class: meta
+  Course: Data management and basic summaries in R
+  Lesson: Introduction to three most common functions from `tidyverse` package
+  Author: Trinh Dong, based on handout by Van Cao Thao and code by Marcel Wolbers, Ronald Geskus and Biostatistic group members, OUCRU-VN
+  Type: Standard
+  Organization: OUCRU-VN
+  Version: 2.4.3
+
+- Class: text
+  Output: |
+    `tidyverse` is a useful package for data transformation.
+    It is the combination of multiple core packages used commonly in data analysis including  ggplot2, tibble, tidyr, and dplyr.
+    
+    In this lesson, we are focusing on functions in `tidyverse` package.
+    Three common task used are `mutate`, `select` and `filter`,
+    which will also be seen multiple times throught out this course.
+
+- Class: text
+  Output: |
+    In many cases, new columns need to be created for example:
+    new column for mean, log transformation, change value between baseline and follow-up.
+    
+    `mutate` function in tidyverse package can be sufficient to do the same thing.
+    
+    `select` has the function of selecting columns of interest.
+    
+    `filter` can help to filter rows from a table or spreadsheet based on required condition.
+
+- Class: cmd_question
+  Output: Now, let's install the `tidyverse` package. If you already installed. Just type installed().
+  CorrectAnswer: install.packages('tidyverse')
+  AnswerTests: check.package('tidyverse')
+  Hint: Use the install.packages() function built in R.
+
+- Class: cmd_question
+  Output: Let's load the `tidyverse` package.
+  CorrectAnswer: library(tidyverse)
+  AnswerTests: any_of_exprs('library(tidyverse)', 'require(tidyverse)', 'library("tidyverse")', 'require("tidyverse")')
+  Hint: Use function `library()` or `require()` with the relevant package name.
+
+- Class: cmd_question
+  Output: |
+    Let's take a look at the `base` table we have already loaded from SQLite file.
+    
+    You can type `head(base)`, `print(base)` or just `base` itself to acquire this within the console.
+    
+    However, `View()` (with capital "V") function might do a better job, especially when it comes to large dataset.
+  CorrectAnswer: View(base)
+  AnswerTests: any_of_exprs('base', 'print(base)', 'View(base)', 'head(base)')
+  Hint: Make use of View(), head(), or print().
+
+- Class: text
+  Output: |
+    As mentioned above, `mutate` function in `tidyverse` can help you create a new column as a transformation of current ones.
+    
+    The syntax for this is:
+    
+      mutate(some_data.frame, new_column_name = some_transform(some_old_columns))
+
+- Class: cmd_question
+  Output: |
+    Let's create a new column called `height.m` within table `base`,
+    converting the current variable `height` from cm into m.
+    
+    Be aware that `mutate` will create a whole new dataset, separated from the old one.
+    So you must assign this back to the variable containing your original dataset.
+  CorrectAnswer: base <- mutate(base, Height.m = Height/100)
+  AnswerTests: omnitest(correctExpr='base <- mutate(base, Height.m = Height/100)')
+  Hint: |
+    Make sure that you have entered something like this:
+    
+        base <- mutate(base, Height.m = Height * some_number)
+
+- Class: cmd_question
+  Output: |
+    Let's do that once more.
+    
+    Now, let's calculate `BMI` by `Weight` and `Height.m` in the `base` table.
+  CorrectAnswer: base <- mutate(base, BMI = Weight/(Height.m*Height.m))
+  AnswerTests: omnitest(correctExpr = 'base <- mutate(base, BMI = Weight/(Height.m*Height.m))')
+  Hint: BMI = weight/(height_in_m * height_in_m)
+
+- Class: text
+  Output: Next, we will learn about selection.
+
+- Class: text
+  Output: |
+    `tidyverse` has a function called `select`.
+    
+    This function takes database as the input while the variables listed after are selected variables. 
+    
+    The syntax is quite similar to that of `mutate`:
+       select(some_data.frame, column_name_1, column_name_2, etc)
+       
+    This function does the same job as the `[]` operation, with some bonuses.
+
+- Class: cmd_question
+  Output: |
+    Quite easy, right?
+    
+    Let select 2 columns named `SUBJID` and `BMI` from table `base`.
+    
+    Be noted that you don't have to quote the column names.
+  CorrectAnswer: select(base, SUBJID, BMI)
+  AnswerTests: omnitest(correctExpr='select(base, SUBJID, BMI)')
+  Hint: Just input `select(base, SUBJID, BMI)`
+
+- Class: text
+  Output: |
+    One reason `select` is superior the normal subsetting is due to its supporting various helpers which make the work of seleciton easier.
+    
+    Some select helpers are:
+    
+      * starts_with('some_text'): all variables have their names start with 'some_text' will be selected.
+      
+      * ends_with('some_text'): all variables have their names start with 'some_text' will be selected.
+      
+      * contains('some_text'): all variables have their names contain 'some_text' will be selected.
+      
+      * matches('some_text'): all variables have their names contain 'some_text' will be selected. The same with `contains()` but with support of regular expressions.
+    
+    You can find other helpers via the support page, by typing: ?select_helpers
+
+- Class: cmd_question
+  Output: Let's open the select_helpers help section
+  CorrectAnswer: ?select_helpers
+  AnswerTests: omnitest(correctExpr='?select_helpers')
+  Hint: Just type ?select_helpers
+  
+- Class: cmd_question
+  Output: Let's select from `base` variables that end with `Ass`, using the `ends_with` or `matches` helpers.
+  CorrectAnswer: select(base, ends_with("Ass"))
+  AnswerTests: any_of_exprs('select(base, ends_with("Ass"))','base %>% select(ends_with("Ass"))', 'select(base, matches("Ass$"))', 'base %>% select(matches("Ass$"))')
+  Hint: |
+    Command should be like this: 
+        select(base, ends_with("Ass"))
+    
+    Or:
+        base %>% select(matches("Ass$"))
+      In case you know regular expressions.
+
+- Class: text
+  Output: |
+    We have learnt how to "select" the columns from a table.
+    
+    Now, we are doing it for the rows, via a function called `filter()`.
+
+- Class: text
+  Output: |
+    Usually, in a dataset, rows don't have name.
+    Hence, just like in Excel, we need conditions to get the rows in which one or two particular variable(s) has/have the value(s) we want.
+    
+    Below is how you could do the filtering:
+       filter(some_data.frame, condition)
+
+- Class: cmd_question
+  Output: |
+    From table `base`, let's get all the observation(s) which has/have SUBJID = 1.
+    
+    Keep in mind that the equality comparision in R uses `==` sign, not `=`.
+    
+    And no need to quote the columns name either.
+  CorrectAnswer: filter(base, SUBJID==1)
+  AnswerTests: omnitest(correctExpr='filter(base, SUBJID==1)')
+  Hint: Just input `filter(base, SUBJID==1)`
+  
+- Class: mult_question
+  Output: What is the dominant gender within the result?
+  AnswerChoices: Male;Female
+  CorrectAnswer: Female
+  AnswerTests: omnitest(correctVal= 'Female')
+  Hint: You already have the right answer yourself. However, try to figure out what is going wrong is more important.
+
+- Class: text
+  Output: Things will get more interesting by now.
+
+- Class: text
+  Output: In the next section, we will learn about a more intuitive way in writing code, all thanks to the helping hand of `tidyverse`'s "pipe".
+
+- Class: text
+  Output: |
+    In case of complex coding like `round(exp(diff(log(x))), 1)`,
+    you will need to put a lot of different function into one single code by using nested parentheses together.
+    
+    It sometimes creates hardship for other to understand your code.
+
+- Class: text
+  Output: |
+    To make it more readable, 
+    pipe operator (noted as %>%) is a suprisingly useful function in `tidyverse` package.
+    
+    It structure the sequence of task from left to right, each follows by a pipe operator.
+    Besides, it can help in minimize the number of new created variables and function definition.
+    Moreover, one can easily check and add further steps afterward. 
+
+- Class: mult_question
+  Output: |
+    Interested in pipe operator? 
+    You can check out this webpage <https://www.datacamp.com/community/tutorials/pipe-r-tutorial>. 
+    This gives you a more detail explanation of why pipe comes in and other usefull operator that you might also want to use.
+    
+    Do you want to visit the website?
+  AnswerChoices: Yes;No
+  CorrectAnswer: NULL
+  AnswerTests: site_visit_2("https://www.datacamp.com/community/tutorials/pipe-r-tutorial")
+  Hint: NULL
+
+- Class: text
+  Output: Ready to go to the next step?
+
+- Class: cmd_question
+  Output: |
+    Now let's do the following tasks in a step-by-step order. Try using the `pipe` operator.
+    
+    - Call the `base` table.
+    
+    - Get all observation(s) that has/have SUBJID = 2.
+    
+    - Select these three columns: SUBJID, BMI, Sex
+  CorrectAnswer: base %>% filter(SUBJID==2) %>% select(SUBJID, BMI, Sex)
+  AnswerTests: omnitest(correctExpr='base %>% filter(SUBJID==2) %>% select(SUBJID, BMI, Sex)')
+  Hint: |
+    The piping operation will send the precedent result to the first parameter of the following function, or wherever there is a `.` .
+    You don't have to call that again.
+
+- Class: exact_question
+  Output: What is the largest BMI within the result table?
+  CorrectAnswer: 23.87511
+  AnswerTests: omnitest(correctVal=23.87511)
+  Hint: Look at the result you just got.
+  
+- Class: text
+  Output: That's the last question. Congratulations! You have finished the second part of the course.

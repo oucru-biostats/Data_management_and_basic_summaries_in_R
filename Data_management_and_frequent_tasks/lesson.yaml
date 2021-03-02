@@ -1,0 +1,679 @@
+- Class: meta
+  Course: Data management and basic summaries in R
+  Lesson: Data management and frequent tasks
+  Author: Trinh Dong, based on handout by Van Cao Thao and code by Marcel Wolbers, Ronald Geskus and Biostatistic group members, OUCRU-VN
+  Type: Standard
+  Organization: OUCRU-VN
+  Version: 2.4.3
+
+- Class: text
+  Output: |
+    Tidying data is an important step to prepare a nice and clean data before data analysis.
+    For each data analysis, the different input and data frame format would be needed. 
+    Therefore, this only gives some suggested packages that could be used for cleaning and tidying messy data.
+    Also, this shows common works when dealing with data analysis.
+
+- Class: text
+  Output: |
+    To get data ready, there are multiple ways of combining, selecting and filtering tables using R base or R cran packages.
+    This section will lead you throught some common tasks that usually occur during data cleaning with the combination of R base and other R packages, especially `tidyverse`. 
+
+- Class: text
+  Output: Section 1 - Separation of information
+
+- Class: text
+  Output: |
+    As described from the begining, the data needs to be in the tidy format.
+    
+    In the `drug9NA`, the column named "DrugDose" includes combination of number and character.
+    In term of further analysis calculation or selection on drugdose,
+    it will cause problem since this column is now store as character rather than numeric.
+    Therefore, the separation of this into two separated collumn of DrugDose and DrugDoseParameter is needed.
+
+- Class: text
+  Output: Make sure that you have fininished the lesson about `tidyverse` package, because in this lesson, we will dig deeper into it.
+
+- Class: text
+  Output: |
+    `separate()` is another function from *tidyverse* package.
+    
+    What it does is take the column of multiple information and separate into multiple column.
+    The number of column splitted depends our information. In here, the separator needs to be clarify.
+    It can be "/", " %", " ",":" or any common character in all rows which can help the function know where to split the data.
+
+- Class: cmd_question
+  Output: Let's take a look at the `drug_9NA` dataset using the appropriate function.
+  CorrectAnswer: View(drug_9NA)
+  AnswerTests: any_of_exprs('View(drug_9NA)','print(drug_9NA)','drug_9NA', 'head(drug_9NA)')
+  Hint: Use the View, print, or head function to view the dataset
+
+- Class: cmd_question
+  Output: Take a closer look at the `DrugDose` column
+  CorrectAnswer: drug_9NA$DrugDose
+  AnswerTests: any_of_exprs('drug_9NA$DrugDose', 'select(drug_9NA, DrugDose)', 'drug_9NA %>% select(DrugDose)', 'drug_9NA["DrugDose"]')
+  Hint: Use the $ sign to get the column inside the table.
+
+- Class: text
+  Output: Did you get the inconsistency?
+
+- Class: cmd_question
+  Output: |
+    Let's use `separate()` to split it to 2 columns: DrugDose containing the number part, and DrugDoseParameter containing the unit half.
+    
+    First, let's look the function up within the Help section. Use the appropriate function to acquire that.
+  CorrectAnswer: ?separate
+  AnswerTests: any_of_exprs('?separate','help(separate)')
+  Hint: Do you know the ? function
+
+- Class: text_question
+  Output: Did you see the `sep` parameter? That's the delimiter on which R based to split the column into 2 halves. Let's decide what it should be. Cover the answer in quotation marks.
+  CorrectAnswer: ' '
+  AnswerTests: robust_value_check(c("' '", '" "'))
+  Hint: It should be space, right?
+
+- Class: text
+  Output: |
+    The `into` parameter is a vector of result columns that you would like to get. Let names these two "DrugDose" and "DrugDoseParameter"
+       (yes, we are overriding the original column, so be careful.)
+
+- Class: text
+  Output: Let's mix them up into a function. 3..2..1...
+
+- Class: cmd_question
+  Output: |
+    Let's use `separate()` to split it to 2 columns: DrugDose containing the number part, and DrugDoseParameter containing the unit half.
+    
+    Leave all other parameters as default, and assign this drug_9NA.sep
+  CorrectAnswer: drug_9NA.sep <- separate(drug_9NA, DrugDose, into= c("DrugDose", "DrugDoseParameter"),sep= " ")
+  AnswerTests: omnitest(correctExpr='drug_9NA.sep <- separate(drug_9NA, DrugDose, into= c("DrugDose", "DrugDoseParameter"),sep= " ")'); 
+  Hint: Let's copy the function in the Help section and fill in the blank.
+
+- Class: text
+  Output: |
+   Did you see the warning? Let's look at the `fill` parameter.
+   
+   That's because sometimes, there is only one part after the split. For instances, "500 MG" should be split to "500" and "MG", but "500" is still "500".
+   Such a confusing result makes R wonder where to place it and where to just leave it be as NA. That was why it showed a warning.
+
+- Class: cmd_question
+  Output: | 
+   The `fill` parameter simply teach R how to deal with that. Let's add this to our function, and assign the result back to drug_9NA
+  CorrectAnswer: drug_9NA <- separate(drug_9NA, DrugDose, into= c("DrugDose", "DrugDoseParameter"),sep= " ", remove=TRUE, convert=FALSE, fill="right")
+  AnswerTests: omnitest(correctExpr='drug_9NA<-separate(drug_9NA, DrugDose, into= c("DrugDose", "DrugDoseParameter"),sep= " ", remove=TRUE, convert=FALSE, fill="right")');expr_creates_var('drug_9NA')
+  Hint: Let's copy the function in the Help section and fill in the blank, add fill = "right" at the end before the closing parenthesis.
+  
+- Class: cmd_question
+  Output: Look at our data again, is it better now?
+  CorrectAnswer: View(drug_9NA)
+  AnswerTests: any_of_exprs('View(drug_9NA)','print(drug_9NA)','drug_9NA', 'head(drug_9NA)')
+  Hint: Use the View, print, or head function to view the dataset
+
+- Class: text
+  Output: Section 2 - Changing data types
+
+- Class: text
+  Output: |
+    `as.()` are set of functions in R that do the work of converting a value from this type to another.
+
+- Class: text
+  Output: |
+    For example, `as.character()` will try to convert your variable(s) to character-type, while `as.numeric()` will change it to number, if possible.
+    
+    Another useful function is `as.factor()`, which can parse your variable to a categorical one without much effort to define level names.
+
+- Class: text
+  Output: |
+    You can see a list of conversion functions by type "as." in the console and witness a list making its appearance.
+
+- Class: cmd_question
+  Output: Let's call out the `SUBJID` column within our `base` dataset.
+  CorrectAnswer: base$SUBJID
+  AnswerTests: omnitest(correctVal=base$SUBJID)
+  Hint: Use the $ sign as usual.
+
+- Class: cmd_question
+  Output: Let's convert them into characters.
+  CorrectAnswer: as.character(base$SUBJID)
+  AnswerTests: omnitest(correctVal=as.character(base$SUBJID))
+  Hint: Use the as.character() function. You can also make use of the pipe operator, which makes the code more intuitive.
+
+- Class: text
+  Output: Did you witness the difference in how R express variable types?
+
+- Class: text
+  Output: |
+    Sometimes, catergorical variables are mistakenly recognized as character type.
+    You want to convert them back to being factors. 
+    Sometimes, it is just to avoid potential issues that might destroy your analysis (I mean, for safety purpose.)
+    
+- Class: text
+  Output: |
+    The former way to do that is through the `factor()` function.
+    However, you might want to use a much more convenient shortcut, which is `as.factor()` conversion.
+    
+- Class: cmd_question
+  Output: |
+    Let convert variable `Sex` within table `base` to a factor using our shortcut.
+    
+    Keep in mind that, you have to assign this back to your original dataset.
+  CorrectAnswer: base$Sex <- as.factor(base$Sex)
+  AnswerTests: omnitest(correctExpr='base$Sex <- as.factor(base$Sex)')
+  Hint: Let input base$Sex <- as.factor(base$Sex). Make sure that you are inputting a capital "S".
+
+- Class: cmd_question
+  Output: |
+    To ensure that you have done right, use the `class()` function.
+    
+    Check if `Sex` within `base` is now currently a factor using the appropriate function below.
+  CorrectAnswer: class(base$Sex)
+  AnswerTests: omnitest(correctExpr='class(base$Sex)', correctVal=class(base$Sex) )
+  Hint: Apply function class to the variable base$Sex
+
+- Class: text
+  Output: |
+    To change type of multiple variables using function in *tidyverse* package, `mutate_at()` can be used to apply function to specified variable.
+    
+    This can also be applied to multiple variables in a dataset by listing all the variables into `vars()` of the function given that all of listed variables will be converted to sample data type wrote in the `.funs`.
+
+- Class: cmd_question
+  Output: Use the `help()` function or ? to take a look at `mutate_at()`
+  CorrectAnswer: ?mutate_at
+  AnswerTests: any_of_exprs('?mutate_at','help(mutate_at)')
+  Hint: Type ?mutate_at
+  
+- Class: text
+  Output: |
+    The syntax for `mutate_at()` should be like this:
+      
+      mutate_at(some_data.frame, vars(var_1, var_2), list((~ your_function_1(), ~ your_function_2())
+    
+- Class: text
+  Output: |
+    The function in the form "~ something()" is called a lambda function (which presumably originates from Python)
+    
+    If there is only one function. list() is no longer mandatory, just enter `~ your_function()` instead.
+    
+- Class: text
+  Output: |
+    You can the variables declared inside vars() to your_function() by using . (named tidy.dots) parameter as a resprentative.
+    
+    The full form of the function becomes ~ your_function(.)
+
+- Class: cmd_question
+  Output: |
+    Let's use this function to convert `SUBJID` and `Birth` within table `base` to character-type variables. Do not assign to anything
+  CorrectAnswer: mutate_at(base, vars(SUBJID, Birth), ~ as.character(.))
+  AnswerTests: omnitest(correctVal=mutate_at(base,vars(SUBJID, Birth), ~ as.character(.)))
+  Hint: |
+    Use can use either pipe syntax or classic nesting syntax. Thing should turn out like:
+       base <- mutate_at(base,vars(...), ~ as.character)
+
+- Class: cmd_question
+  Output: |
+    Let's take it a little bit further.
+    Now convert `Weight` and `Height` within `base` to numeric variables.
+  CorrectAnswer: mutate_at(base, vars(Weight,Height), ~ as.numeric(.))
+  AnswerTests: omnitest(correctVal=mutate_at(base, vars(Weight,Height), ~ as.numeric(.)))
+  Hint: |
+    Use can use either pipe syntax or classic nesting syntax. Thing should turn out like:
+       base <- mutate_at(base,vars(...), ~ as.character))
+
+- Class: text
+  Output: |
+    As a reminder, usually patient IDs are usually kept under character types. 
+    Therefore, it is crucial to check and convert patient ID to character type.
+
+- Class: text
+  Output: Section 3 - Renaming columns
+
+- Class: text
+  Output: |
+    If the variable names contain special character(%, *, ?..), space in between or capital letter,
+    this may make the variable selection latter become hard. 
+
+- Class: cmd_question
+  Output: Let's take a look at the column names of table `base`.
+  CorrectAnswer: names(base)
+  AnswerTests: omnitest(correctVal=names(base))
+  Hint: Use `colnames()` or `names()` to get the column names of a data table.
+
+- Class: cmd_question
+  Output: Let's take another look at the column names of table `drug`.
+  CorrectAnswer: names(drug)
+  AnswerTests: omnitest(correctVal=names(drug))
+  Hint: Use `colnames()` or `names()` to get the column names of a data table.
+
+- Class: text
+  Output: |
+    From the output, one can see the inconsistency in the column names like TimeAss and Date_Ass.
+    
+    Also, when you look at column names from other tables like `drug`,
+    you would see the different in the name for Date_Ass in `base` and DateAss in **drug**.
+
+- Class: text
+  Output: |
+    This would give a difficulty when you want to join these two tables in case these two column are exactly the same.
+    The fact of joining two tables will see these two column differently because of their names.
+
+- Class: text
+  Output: |
+    Therefore, one needs to take column names into consideration. 
+    
+    In R, there are number of ways that can help to change the column names. 
+
+- Class: text
+  Output: |
+    In `clean_names()` function in `janitor` package,
+    taking the input as a data frame, you can specify how to convert column names of a data frame by indicating your choice of `case =` within the function.
+    
+    In the following exercise, we put "big_camel" for `case =` so that it can convert Date_Ass to DateAss, which makes this consistent with DateAss column in **drug**. 
+
+- Class: cmd_question
+  Output: First and foremost, let's install `janitor` package. Use appropriate function or type installed() to you have installed.
+  CorrectAnswer: install.packages('janitor')
+  AnswerTests: check.package('janitor')
+  Hint: Use the install.packages() function built in R.
+
+- Class: cmd_question
+  Output: Now load the library `janitor`.
+  CorrectAnswer: library(janitor)
+  AnswerTests: any_of_exprs('library(janitor)', 'require(janitor)', 'library("janitor")', 'require("janitor")')
+  Hint: Use function `library()` or `require()` with the relevant package name.
+
+- Class: cmd_question
+  Output: |
+    Clean column names for able `base` using the `clean_names()` function. Use the "big_camel" method for `case`. 
+    The appropriate syntax for the function should be 
+      clean_names(some_data.frame, case = "some_case")
+      
+    Assign the result to variable `base_camel`
+  CorrectAnswer: base_camel <- clean_names(base, case = "big_camel")
+  AnswerTests: omnitest(correctExpr='base_camel <- clean_names(base, case = "big_camel")')
+  Hint: Apply clean_names(base, case = 'big_camel') then assign that to `base_camel`
+
+- Class: cmd_question
+  Output: Take a look at `base_camel`'s column names. Use appropriate function.
+  CorrectAnswer: colnames(base_camel)
+  AnswerTests: any_of_exprs('colnames(base_camel)', 'names(base_camel)')
+  Hint: Use function `colnames` or `names`
+
+- Class: text
+  Output: Did you see something unexpected?
+
+- Class: text
+  Output: |
+    Blindly applying the function on a whole dataset can potentially cause problems to other columns,
+    such as `SUBJID` to `Subjid`.
+    You either have to take care of each column separately and the rejoin them later, or simplier, use a different function. 
+
+- Class: text
+  Output: |
+    `tidyverse` provides another function called `rename()` whose function is clearly declared by its name.
+    
+    This is manual task compared to `clean_names()` where the computer just change all column names following a pre-defined template.
+    
+    `rename()`, on the other hand, gives you more freedom and control on how the names should be.
+
+- Class: cmd_question
+  Output: |
+    In this question wwe will manually rename `Date_Ass` as `DateAss` within table `base`. Please make use of `rename()`.
+    Syntax should go like this:
+        rename(some_data.frame, newName_1 = oldName_1, newName_2 = oldName_2,...)
+        
+    Assign it back to `base`.
+  CorrectAnswer: base <- rename(base, DateAss = Date_Ass)
+  AnswerTests: omnitest(correctExpr='base <- rename(base, DateAss = Date_Ass)');expr_creates_var('base')
+  Hint: Remember to assign the renamed dataset back to our variable `base`.
+
+- Class: text
+  Output: Section 4 - Joining data
+
+- Class: text
+  Output: |
+    Joining data is a common task in data analysis. 
+    Depending on the purpose of joining data, there are different functions from `tidyverse` package. 
+    This shows some common functions. 
+
+- Class: mult_question
+  Output: |
+    Further investigation on joining data can be viewed in the "Data Wrangling with dplyr and tidyr Cheat Sheet"
+    in this link `https://www.rstudio.com/wp-content/uploads/2015/02/data-wrangling-cheatsheet.pdf`
+    
+    Do you want to visit the link? (Yes/No)
+  AnswerChoices: Yes;No
+  CorrectAnswer: NULL
+  AnswerTests: site_visit_2("https://www.rstudio.com/wp-content/uploads/2015/02/data-wrangling-cheatsheet.pdf")
+  Hint: NULL
+
+- Class: mult_question
+  Output: |
+    Also, for a better understanding, 
+    one may look at this webinar tutorial by Rstudio about data wrandling via this link 
+    "https://www.youtube.com/watch?v=y9KJmUGc8SE"
+    
+    Do you want to visit it now? (Yes/No)
+  AnswerChoices: Yes;No
+  CorrectAnswer: NULL
+  AnswerTests: site_visit_2("https://www.youtube.com/watch?v=y9KJmUGc8SE")
+  Hint: NULL
+
+- Class: text
+  Output: We will first learn about left joining.
+
+- Class: text
+  Output: |
+    The example below will join `table_2` to `table_1`, base on the information on `column`, while keeping all data in table_1.
+        left_join(table_1, table_2, by = "column")
+
+- Class: cmd_question
+  Output: |
+    Let's join `ae` to `base`, match the `SUBJID` in `ae` to `base`, keeping all observation in `base`.
+    
+    Assign the result to `base_ae`.
+  CorrectAnswer: base_ae <- left_join(base, ae, by = "SUBJID")
+  AnswerTests: omnitest(correctVal=left_join(base, ae, by = "SUBJID"))
+  Hint: |
+    Write: left_join(base, ae, by = "SUBJID")
+
+- Class: cmd_question
+  Output: Take a look at `base_ae` using `head()`
+  CorrectAnswer: head(base_ae)
+  AnswerTests: omnitest(correctExpr='head(base_ae)', correctVal=head(base_ae))
+  Hint: Remember `head()`?
+
+- Class: text
+  Output: |
+    Notice that table `base` has been kept inact, with some additional matched values originating from `ae`.
+  
+    This is useful when you want create a table with all observations and check whether they have witnessed adverse event during the research period.
+
+- Class: text
+  Output: |
+    `right_join()` still merge `ae` to `base`. However, this time, only observation that is currently in `ae` is kept.
+
+- Class: cmd_question
+  Output: |
+    Let's rejoin `ae` to `base`. This time use `right_join()` instead.
+    
+    Assign the result to `base_ae_right`
+  CorrectAnswer: base_ae_right <- right_join (base, ae, by = "SUBJID")
+  AnswerTests: omnitest(correctExpr='base_ae_right <- right_join (base, ae, by = "SUBJID")')
+  Hint: |
+    Write: right_join(base, ae, by = "SUBJID")
+
+- Class: cmd_question
+  Output: Take a look at the head of `base_ae_right`
+  CorrectAnswer: head(base_ae_right)
+  AnswerTests: omnitest(correctExpr='head(base_ae_right)', correctVal=head(base_ae_right))
+  Hint: Remember `head()`?
+
+- Class: text
+  Output: |
+    See the difference in `left_join()` and `right_join()`?
+    
+    This is useful when you want to create a table exclusive for adverse events, with all patient demographic infomation and randomization data.
+
+- Class: text
+  Output: |
+    `inner_join()` is a method that joining two tables while only keeping shared obverations.
+
+- Class: cmd_question
+  Output: |
+    Let's rejoin `ae` to `base`. This time use `inner_join()` instead.
+    
+    Assign the result to `base_ae_inner`
+  CorrectAnswer: base_ae_inner <- inner_join (base, ae, by = "SUBJID")
+  AnswerTests: omnitest(correctExpr='base_ae_inner <- inner_join (base, ae, by = "SUBJID")')
+  Hint: |
+    Just type: inner_join (base, ae, by = "SUBJID")
+
+- Class: cmd_question
+  Output: Take a look at the head of `base_ae_inner`
+  CorrectAnswer: head(base_ae_inner)
+  AnswerTests: omnitest(correctExpr='head(base_ae_inner)', correctVal=head(base_ae_inner))
+  Hint: Remember `head()`?
+
+- Class: text
+  Output: This is useful when you need to extract observations from a specific arm with adverse events.
+
+- Class: text
+  Output: The last function in this series is `full_join()`. It merely combines two table, keeping all observations existing in at least one.
+  
+- Class: cmd_question
+  Output: |
+    Let's rejoin `ae` to `base`. This time use `full_join()` instead.
+    
+    Assign the result to `base_ae_full`
+  CorrectAnswer: base_ae_full <- full_join (base, ae, by = "SUBJID")
+  AnswerTests: omnitest(correctExpr='base_ae_full <- full_join (base, ae, by = "SUBJID")')
+  Hint: |
+    Just type: full_join (base, ae, by = "SUBJID")
+    
+- Class: cmd_question
+  Output: Take a look at the head of `base_ae_full`
+  CorrectAnswer: head(base_ae_full)
+  AnswerTests: omnitest(correctExpr='head(base_ae_full)', correctVal=head(base_ae_full))
+  Hint: Remember `head()`?
+  
+  #the part about joining >2 tables is omitted because of unneccesary complication. Just do it step by step.
+
+- Class: text
+  Output: Section 5 - Transform data from wide format to long format and vice versa
+
+- Class: text
+  Output: |
+    In some cases, columns or rows may not be in tidy format with each variable in a separate column and each observation is on its own row. 
+    Therefore, data needs to be transformed to change the layout of the table. 
+
+- Class: text
+  Output: There are various ways to do this.
+
+- Class: text
+  Output: |
+    In base R, `reshape` function is one way of dealing with this problem. 
+    In `tidyverse` package, two `pivot_` functions can also do the work.
+    
+- Class: text
+  Output: |
+    We will look further into these two functions, but let's first learn about the notion of 'long' and 'wide' data format.
+
+- Class: figure
+  Output: |
+    Let's look at the image. Feel free to zoom in if needed.
+  Figure: data-format.R
+  FigureType: new
+  
+- Class: text
+  Output: The table on the left is what you might collect from data input. It contains several variables in one column. In this case, the test repititions their respective results.
+
+- Class: text
+  Output: |
+    The table on the right is what it should be before the analysis. A tidy data contains one and only one variable per column.
+    
+- Class: text
+  Output: Hope this help you point out the difference.
+  
+- Class: cmd_question
+  Output: Let go the excercise. First, open the prepared dataset named `Data.wide` using `View` function.
+  CorrectAnswer: View(Data.wide)
+  AnswerTests: omnitest(correctExpr='View(Data.wide)', correctVal=View(Data.wide))
+  Hint: Note that both View() and Data.wide have capital first letter.
+
+- Class: text
+  Output: |
+    You might notice that this is what it appears to be in "wide format". Your job is to change it to long format. You can use the recent figure as a reference.
+
+- Class: cmd_question
+  Output: The function to do that in tidyverse/tidyr package is called `pivot_longer`. Type ?pivot_longer to see the arguments.
+  CorrectAnswer: ?pivot_longer
+  AnswerTests: omnitest(correctExpr='?pivot_longer', correctVal=?pivot_longer)
+  Hint: Please type ?pivot_longer
+  
+- Class: text
+  Output: We will play with the 3 required parameters.
+  
+- Class: text
+  Output: |
+    1. data: a data frame to pivot. This can be passed via pipe `%>%` or directly inside the function.
+    
+- Class: text
+  Output: |
+    1. cols: just like the `select` function in tidyverse/dplyr. You declare the columns you want to select.
+    
+- Class: cmd_question
+  Output: |
+    Some convenient shorthands, such as starts_with(), ends_with(), matches(), or contains(), can also be used.
+    
+    You can type "?tidyselect::select_helpers" to read the details or "skip()" to skip this task.
+  CorrectAnswer: ?tidyselect::select_helpers
+  AnswerTests: omnitest(correctExpr='?tidyselect::select_helpers', correctVal=?tidyselect::select_helpers)
+  Hint: Please type ?select_helpers or skip() to skip this task.
+  
+- Class: text
+  Output: You can use c(column1, column2) to conventionally select column1 and column2, just in case.
+  
+- Class: text
+  Output: |
+    3. names_to: is the name of the new column which will store the names of selected columns. In the example, this is the column "time" of the second table.
+
+- Class: text
+  Output: |
+    4. values_to: is the name of the new column which will store the respective values. In the example, this is the column "bldwcc" of the second table.
+    
+- Class: text
+  Output: You have gone through all the required parameters of the function. Your job is now to reproduce the example from the loaded "Data.wide".
+  
+- Class: cmd_question
+  Output: |
+    Use the function `pivot_longer` to create a "Data.long" table under following constraints:
+    
+    - Two columns 'bldwcc.1' and 'bldwcc.2' contain white cell count in from 2 blood tests, namely "1" and "2".
+    
+    - Your task is to distribute them into 2 separated columns: "time" for the name of test and "bldwcc" for the result.
+    
+    - Please use the `pivot_longer` function.
+    
+    - Save the new dataset as `Data.long.1`
+  CorrectAnswer: Data.long.1 <- Data.wide %>% pivot_longer(cols = c(bldwcc.1, bldwcc.2), names_to = "time", values_to = "bldwcc")
+  AnswerTests: omnitest(correctVal = Data.wide %>% pivot_longer(cols = c(bldwcc.1, bldwcc.2), names_to = "time", values_to = "bldwcc"));expr_creates_var('Data.long.1')
+  Hint: Please choose the two columns in the cols parameter, declare "time" for names_to, and "bldwcc" for values_to.
+  
+- Class: cmd_question
+  Output: Let's witness what was born using `head` or `View`
+  CorrectAnswer: head(Data.long.1)
+  AnswerTests: any_of_exprs('head(Data.long.1)', 'View(Data.long.1)')
+  Hint: Applying `head` or `View` on Data.long.1
+  
+- Class: text
+  Output: |
+    As you can see, the "time" variable contains 2 values: "bldwcc.1", and "bldwcc.2", which is fairly true, but not strictly what we really want (as least in comparison with the example).
+    
+    The "bldwcc" contains exactly expected values. We have nothing to complain here.
+    
+- Class: text
+  Output: Our next task is to tackle the problem with "time". We have to find a way to substract the "bldwcc." prefix.
+  
+- Class: text
+  Output: In base R, you can either use `substr` function to extract the last character of the strings or `gsub` to remove the unwanted prefix. All can be done in an extra step.
+
+- Class: text
+  Output: Another convenient way is to make use of the `names_prefix` parameter built within `pivot_longer` function.
+  
+- Class: text
+  Output: The `names_prefix` parameter takes the unwanted string and substracts it from the names before putting in into the result table.  
+    
+- Class: text
+  Output: In this case, it is 'bldwcc.'
+  
+- Class: cmd_question
+  Output: Re-apply the `pivot_longer()` function, now with `names_prefix` to remove the respective prefixes. Name it `Data.long.2`
+  CorrectAnswer: Data.long.2 <- Data.wide %>% pivot_longer(cols = c(bldwcc.1, bldwcc.2), names_to = "time", values_to = "bldwcc", names_prefix = "bldwcc.")
+  AnswerTests: omnitest(correctVal = Data.wide %>% pivot_longer(cols = c(bldwcc.1, bldwcc.2), names_to = "time", values_to = "bldwcc", names_prefix = "bldwcc.")); expr_creates_var('Data.long.2')
+  Hint: Rerun the recent function, now with names_prefix = 'bldwcc.'
+  
+- Class: cmd_question
+  Output: Let's witness what was born using `head` or `View`
+  CorrectAnswer: head(Data.long.2)
+  AnswerTests: any_of_exprs('head(Data.long.2)', 'View(Data.long.2)')
+  Hint: Applying `head` or `View` on Data.long
+  
+- Class: text
+  Output: Notice some other problems?
+  
+- Class: text
+  Output: If you use `head()`, you might notice that `time`, albeit numbers, the test `times` are treated as `chr`, which stands for `character()` type.
+
+- Class: text
+  Output: Concretely, this can be convert later in a subsequent step. However, a short hand to acquire this is to use `names_ptypes`
+
+- Class: text
+  Output: |
+    `names_ptypes` accepts a list of empty vectors whose names match the title of the new "name" column, in this case, "time".
+  
+- Class: text
+  Output: |
+    "Empty vectors" are created using conventional constructor functions, such as `integer()`, `numeric()`, `character()`, and `factor()`.
+  
+- Class: cmd_question
+  Output:  Re-apply the `pivot_longer()` function, now with both `names_prefix` and `names_ptypes`. Name it `Data.long`
+  CorrectAnswer: Data.long <- Data.wide %>% pivot_longer(cols = c(bldwcc.1, bldwcc.2), names_to = "time", values_to = "bldwcc", names_prefix = "bldwcc.", names_ptypes = list(time=integer()))
+  AnswerTests: omnitest(correctVal = Data.wide %>% pivot_longer(cols = c(bldwcc.1, bldwcc.2), names_to = "time", values_to = "bldwcc", names_prefix = "bldwcc.", names_ptypes = list(time=integer()))); expr_creates_var('Data.long')
+  Hint: Re-run the recent function, now with names_ptypes = list(time = integer())
+  
+- Class: cmd_question
+  Output: Let's witness what was born using `head` or `View`
+  CorrectAnswer: head(Data.long)
+  AnswerTests: any_of_exprs('head(Data.long)', 'View(Data.long)')
+  Hint: Applying `head` or `View` on Data.long
+  
+- Class: text
+  Output: You can also re-define values types too, via `values_ptypes`, but usually it will remain intact.
+  
+- Class: text
+  Output: Now we are going to make it wide again, using another function, intuitively called `pivot_wider()`
+  
+- Class: text
+  Output: This is what you not usually do in practice. However, just in case you might need this, we will briefly have a look.
+  
+- Class: cmd_question
+  Output: Type ?pivot_wider to see the necessary parameters. Or simply skip() to skip this task.
+  CorrectAnswer: ?pivot_wider
+  AnswerTests: omnitest(correctExpr='?pivot_wider', correctVal=?pivot_wider)
+  Hint: Please type ?pivot_wider
+  
+- Class: text
+  Output: |
+    Not much differently, the function takes 3 necessary parameters:
+    
+    1. data: is the data frame which need converting to wide format.
+    
+    2. names_from: a direct opposition to `names_to`. Values in this column are to become column names of the new table.
+    
+    3. values_from: a direct oppposition to `values_to`. Values in this column are to be spreaded into different columns in the new table, depending on the names.
+
+- Class: text
+  Output: |
+    Similarily, this function also support `names_prefix`, which have a reversed effect in comparision to `pivot_longer`'s counterpart.
+    
+- Class: cmd_question
+  Output: |
+    Let's reproduce Data.wide by create a data from Data.long with the new names should have prefix 'bldwcc.' before each test's id. Name it `Data.wide`.
+  CorrectAnswer: Data.wide <- Data.long %>% pivot_wider(names_from = time, values_from = bldwcc, names_prefix = 'bldwcc.')
+  AnswerTests: omnitest(correctVal=Data.long %>% pivot_wider(names_from = time, values_from = bldwcc, names_prefix = 'bldwcc.')); expr_creates_var('Data.wide')
+  Hint: Use pivot_wider with names_from = time, values_from = bldwcc, and names_prefix = 'bldwcc.'
+  
+- Class: mult_question
+  Output: |
+    There are many more to learn about pivoting on tidyverse's home site. You can visit the site at: 
+    "https://tidyr.tidyverse.org/dev/articles/pivot.html"
+    
+    Do you want to visit the site? (Yes/No)
+  AnswerChoices: Yes;No
+  CorrectAnswer: NULL
+  AnswerTests: site_visit_2("https://tidyr.tidyverse.org/dev/articles/pivot.html")
+  Hint: NULL
+  
+- Class: text
+  Output: |
+    That's basically all we have to learn about data transformation. Let's move to the final part, namely "Dealing with date/time data". 
+

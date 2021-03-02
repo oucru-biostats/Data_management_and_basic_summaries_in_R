@@ -1,0 +1,426 @@
+- Class: meta
+  Course: Data_management_and_basic_summaries_in_R
+  Lesson: Dealing with date-time data
+  Author: Trinh Dong, based on code by Van Cao Thao
+  Type: Standard
+  Organization: OUCRU-VN
+  Version: 2.4.4
+
+- Class: text
+  Output: Welcome to the last lesson in the course "Data management and basic summaries in R"
+
+- Class: text
+  Output: |
+    In this lesson, we will learn how to deal with date-time data, such as:
+    
+    - Parsing,
+    
+    - Conversion,
+    
+    - And Calculation of date/time.
+
+- Class: text
+  Output: |
+    Section 1. First we will learn about Date parsing.
+
+- Class: text
+  Output: |
+    Date-time data is usually hard to deal with, especially due to their being inputted as "string" with unexpected format.
+    
+- Class: text
+  Output: You will now see some examples of how date-time data can be stored.
+
+- Class: figure
+  Output: Completely separated dates in this dataset can be considered as the easiest way to deal with.
+  Figure: date-time-example.1.R
+  FigureType: new
+
+- Class: figure
+  Output: |
+    Oppositely, in certain cases, they can be as messy as this:
+  Figure: date-time-example.2.R
+  FigureType: new
+
+- Class: text
+  Output: As you can easily see, there are several styles of dates stored here.
+
+- Class: text
+  Output: |
+    They can be as analytically friendly as the BIRTHDAY-BIRTHMON-BIRTHYR trio, where numbers are stored separatedly. 
+    This is the most ideal case.
+    
+- Class: text
+  Output: However, they can also be stored as a combined string, with a seperator, like TreatmentSTDate and TreatmentENDate.
+    
+- Class: text
+  Output: |
+    In the above example, "/" (slash) serves as the separator. But occasionally, it can be "-" or "."
+    
+- Class: text
+  Output: |
+    To make things even worse, years can be stored in different forms:
+    
+    - Full form with 4 digits, like 2013
+    
+    - Or short hand, such as 14
+
+- Class: text
+  Output: |
+    Month before October can also be stored with or without leading 0. The same goes with date before 10.
+    
+- Class: text
+  Output: And we have yet to mention the time part yet.
+
+- Class: text
+  Output: Such an inconsistency usually originates from data input, and is difficult to deal with.
+  
+- Class: text
+  Output: |
+    There are several packages that can partialy deal with this problem. You might be familiar with the conventional `as.Date` function.
+    
+    However, in this lesson, we will cover a more sophisticated approach coming from the `lubridate` package, part of the tidyverse world.
+
+- Class: text
+  Output: In this lesson, we will learn how to efficiently parse date-time data by making use of the `lubridate` package.
+
+- Class: cmd_question
+  Output: First, let's install lubridate. Type installed() if you have done that already (not skip()).
+  CorrectAnswer: install.packages('lubridate')
+  AnswerTests: check.package('lubridate')
+  Hint: Note that you can install package 'pkg' by typing install.packages('pkg').
+  
+- Class: cmd_question
+  Output: Get the lubridate loaded.
+  CorrectAnswer: library('lubridate')
+  AnswerTests: check.loaded('lubridate')
+  Hint: Use `library` or `require` to load a package.
+
+- Class: text
+  Output: |
+    The command to parse date time in this package is named "parse_date_time()" (with two underscores).
+
+- Class: cmd_question
+  Output: Type ?parse_date_time to look at the parameter list.
+  CorrectAnswer: ?parse_date_time
+  AnswerTests: omnitest(correctExpr='?parse_date_time', correctVal=?parse_date_time)
+  Hint: Type ?parse_date_time.
+
+- Class: text
+  Output: As you can see, the function is quite flexible, although some parameters are mandatory.
+  
+- Class: text
+  Output: |
+    1. First is x: the character vector that you are going to parse into proper date-time value. In this case, it can be `date.time.example.2$TreatmentSTDate`
+
+- Class: text
+  Output: |
+    2. orders: Is a combination of candidated orders in included in `x`. 
+    By mere order, it means you don't have to either use prefix % or declare separator, like what you usually did with `as.Date`.
+    
+- Class: text
+  Output: For example, 'mm/dd/yyyy', 'm/d/y', 'mm-dd-yy', etc, all can be parsed with orders = 'mdy' and orders = c('dmy', 'mdy'), but not with orders = 'dmy'.
+
+- Class: text
+  Output: |
+    Intuitively, non-capital `d`, `m`, and `y` respectively stand for day, month, and year;
+    while capital `H`, `M`, `S` stand for Hour, Minutes, and Second.
+    
+- Class: text
+  Output: |
+    There are some more unusual substitutions for ordering, like `A` and `a` stand for full or abbreviated weekdays, `I` for am/pm hours, and `b` for month name in full text (i.e. January and the like).
+    
+    Please refer to the recently opened help section for more information.
+
+- Class: text
+  Output: Before going to the next part. Let's try parsing the TreatmentSTDate.
+
+- Class: cmd_question
+  Output: Let try parsing column `TreatmentSTDate` from `date.time.example.2` table by making use of lubridate's `parse_date_time()`
+  CorrectAnswer: parse_date_time(date.time.example.2$TreatmentSTDate, orders='dmy')
+  AnswerTests: omnitest(correctVal=parse_date_time(date.time.example.2$TreatmentSTDate, orders='dmy'))
+  Hint: |
+    It's worth noting that the variable's order is "dmy".
+
+- Class: text
+  Output: You might notice there is a repeated suffix written "UTC". That is the default time-zone set within `parse_date_time`.
+  
+- Class: text
+  Output: |
+    3. tz: it is not a mandatory parameter de facto, but as you can see the default time zone set in the function is unfortunately 'UTC', which is usually not our case (UTC+7 in Vietnam).
+    
+    So, if you care about time zone (for instance, multi-national study which has local time inputted), properly declare this parameter is definitely a must.
+
+- Class: text
+  Output: |
+    In most cases, you can set the tz to System time zone, which is retrieved by calling Sys.timezone()
+
+- Class: cmd_question
+  Output: Let's see what the current time zone is.
+  CorrectAnswer: Sys.timezone()
+  AnswerTests: omnitest(correctExpr='Sys.timezone()', correctVal=Sys.timezone())
+  Hint: Recall the mentioned function.
+
+- Class: text
+  Output: How about the other time-zones? Time zones in R are named using Olson standard. You can get a list of timezone in R by typing `OlsonNames()`.
+
+- Class: cmd_question
+  Output: |
+    Let's have look at 'OlsonNames'
+  CorrectAnswer: OlsonNames()
+  AnswerTests: omnitest(correctExpr='OlsonNames()', correctVal=OlsonNames())
+  Hint: Recall the mentioned function.
+  
+- Class: text
+  Output: You might see the list is overwhelming and is not intuitive. 
+  
+- Class: figure
+  Output: A better list we provide here can help you have a better look.
+  Figure: time-zones.R
+  FigureType: new
+  
+- Class: text
+  Output: You can either save it for later or google it with keyword "Olson names of timezone"
+
+- Class: mult_question
+  Output: Do you want to save the the time-zone database?
+  AnswerChoices: Yes; No
+  CorrectAnswer: No
+  AnswerTests: save_csv(Time_Zones)
+  Hint: NULL
+  
+- Class: text
+  Output: |
+    4. Another parameter is `locale`. Just like `tz`, `locale` is not necessary defined unless you have non-English month names (like Januar) which don't match the System locale.
+  
+- Class: cmd_question
+  Output: |
+    That's all for the instruction of date-time parsing.
+    
+    Let re-try parsing column `TreatmentSTDate` from `date.time.example.2` table by making use of lubridate's `parse_date_time()`.
+    
+    Remember to use the time-zone correction to System timezone.
+  CorrectAnswer: parse_date_time(date.time.example.2$TreatmentSTDate, orders='dmy', tz=Sys.timezone())
+  AnswerTests: omnitest(correctVal=parse_date_time(date.time.example.2$TreatmentSTDate, orders='dmy', tz=Sys.timezone()))
+  Hint: |
+    The function the get system time-zone is Sys.timezone(). Remember?
+    
+- Class: text
+  Output: |
+    What if you don't want a time-zone included in your output? In other words, you just do not care about that in your analysis.
+    
+    This is usually the case when you only have the date and not the exact time.
+  
+- Class: text
+  Output: |
+    A workaround is to wrap the whole stuff inside the conventional as.Date() function, or via tidyverse's `%>%` (pipe).
+
+- Class: script
+  Output: |
+    Let's try create a custom function to achieve that.
+    Write a script that:
+     - Receive `x` as a vector to parse.
+     - `orders` as orders candidates.
+     - Return a vector of type "Date" that contain the parsed value of `x`.
+  AnswerTests: test.parse_to_date()
+  Hint: Gather what you have learnt till now and wrap them all in one function so that you can reuse it later.
+  Script: parse_to_date.R
+
+- Class: text
+  Output: Actually, lubridate does provide a similiar solution, via some convenient shorthands.
+  
+- Class: text
+  Output: |
+    These functions with respective order ymd(), ydm(), myd(), mdy(), dmy(), and dym() can serve as shorthands 
+    for your recently written `parse_to_date(x, orders)` function. The outputs will be conveniently returned as a `Date` object.
+
+- Class: text
+  Output: |
+    There as some other shorthands such as ymd_hms() and the like that will be useful if you have consistent order throughout your data.
+    
+    The outputs will be conventional POSIXct (basically Date-time with Time-zones), which make very good sense in the case where times do exist.
+
+- Class: figure
+  Output: Sometimes, the date might be wrongly inputted, like this.
+  Figure: base.dateTime.R
+  FigureType: new
+  
+- Class: text
+  Output: |
+    As you can see, each DayAss includes an extra 12:00, which is wrong. The actual time is included within TimeAss.
+
+- Class: text
+  Output: You can use some sophisticated functions to remove this extra time point. 
+  
+- Class: text
+  Output: In base R, `gsub` is the function of choice. 
+  
+- Class: text
+  Output: In tidyverse/stringr, str_replace can basically do the same work. Choosing what to use is a mere matter of interest.
+
+- Class: text
+  Output: |
+    In this lesson, it is encouraged to use the second one, due to its ability to make an element-wise replacement between 2 vectors (unless you can remember both ^^).
+    
+    Be aware that you have to load stringr (part of tidyverse) first.
+    
+- Class: cmd_question
+  Output: Let's load stringr. If it is not available, install it.
+  CorrectAnswer: library(stringr)
+  AnswerTests: check.loaded('stringr')
+  Hint: Please try remembering how to install and load libraries.
+  
+- Class: text
+  Output: |
+    Provided that x is a vector that contains several strings (which is exactly what our DateAss is). Let's call each of them x' (x prime).
+    
+    gsub(pattern, replacement, x) and str_replace(x, pattern, replacement) will search for any text that matches `pattern` inside every x', and then replace it with `replacement`.
+  
+    In the later case, replacement can either be a text or a vector with the same length as x. In the second case, it will make an element-wise replacement (replacement[i] will replace x[i])
+  
+- Class: text
+  Output: |
+    For instance, 
+    gsub('m', 'd', c('monkey_1', 'monkey.2')) 
+    
+    and 
+    str_replace(c('monkey_1', 'monkey.2'), 'm', 'd')
+    
+    will return c('donkey_1', 'donkey.2')
+    
+    while 
+    gsub('k', '', c('monkey_1', 'monkey.2')) 
+    
+    and str_replace(c('monkey_1', 'monkey.2'), 'k', '') 
+    
+    will return c('money_1', 'money.2').
+
+- Class: text
+  Output: |
+    In the same vein, only str_replace(c('monkey_1', 'monkey.2'), 'monkey', c('gorilla', 'chimpanzee')) 
+    
+    would return c('gorilla_1', 'chimpanzee.2').
+    
+    gsub('monkey', c('gorilla', 'chimpanzee'), c('monkey_1', 'monkey.2')) 
+    
+    will return c('gorilla_1', 'gorilla.2') with a warning.
+
+- Class: cmd_question
+  Output: |
+    Create a vector that have the same value as base$DateAss, but with the extra ' 12:00' remove, use either gsub or str_replace.
+  CorrectAnswer: str_replace(base$DateAss, ' 12:00', '')
+  AnswerTests: omnitest(correctVal = str_replace(base$DateAss, ' 12:00', ''))
+  Hint: Be aware that there is an extra space between the dates and the times.
+  
+- Class: text
+  Output: Now you basically have the ability to parse them normally using either conventional `parse_date_time` or shorthanded `mdy`.
+
+- Class: cmd_question
+  Output: |
+    Not that common, but provided that you want to replace the extra time with values from base$TimeAss, create a vector that follow such constraint.
+    
+    Assign that back to base$DateTimeAss.
+  CorrectAnswer: base$DateTimeAss <- str_replace(base$DateAss, '12:00', base$TimeAss)
+  AnswerTests: omnitest(correctExpr = "base$DateTimeAss <- str_replace(base$DateAss, '12:00', base$TimeAss)")
+  Hint: Remember that only str_replace can be used in this case.
+
+- Class: cmd_question
+  Output: |
+    As a wrap-up, parse the newly-created column with lubridate function. Time zone will be that of your computer.
+    
+    Let the result override base$DateTimeAss.
+  CorrectAnswer: base$DateTimeAss <- mdy_hm(base$DateTimeAss, tz = Sys.timezone())
+  AnswerTests: omnitest(correctVal = mdy_hm(base$DateTimeAss, tz = Sys.timezone()))
+  Hint: You can use either the full-fledged parse_date_time or the shorthanded mdy_hm (yes, that's the order).
+  
+- Class: text
+  Output: That concludes the first section of the lession. 
+  
+- Class: text
+  Output: |
+    Section 2. We will now move on to Time calculation.
+
+- Class: text
+  Output: |
+    One beauty of 'Date' and 'POSIXct' data type is the ability of calculation.
+
+- Class: text
+  Output: |
+    In R, results from a substraction between two time-points is of class "difftime".
+    
+- Class: text
+  Output: |
+    A difftime object can have different units, either choosen automatically or manually defined by analysts.
+
+- Class: cmd_question
+  Output: |
+    Let's try a simple calculation. Assuming that we have two time-points. t1 = 2019/2/1 and t2 = 2018/12/6. All in y/m/d format.
+    
+    Get the difference between t1 and t2 and witness the output.
+  CorrectAnswer: t1-t2
+  AnswerTests: omnitest(correctExpr='t1-t2')
+  Hint: Simply substract t2 from t1.
+ 
+- Class: cmd_question
+  Output: |
+    Check for the data type of t1-t2 by wrapping it inside `typeof()`
+  CorrectAnswer: typeof(t1-t2)
+  AnswerTests: omnitest(correctExpr='typeof(t1-t2)', correctVal=typeof(t1-t2))
+  Hint: Just type typeof(t1-t2)
+  
+- Class: text
+  Output: Is it written "double"? That means the calculation is in fact the substraction of two numbers.
+  
+- Class: cmd_question
+  Output: |
+    Check for the data class of t1-t2 by wrapping it inside `class()`
+  CorrectAnswer: class(t1-t2)
+  AnswerTests: omnitest(correctExpr='class(t1-t2)', correctVal=class(t1-t2))
+  Hint: Just type class(t1-t2)
+
+- Class: text
+  Output: Is it written "difftime"?
+
+- Class: text
+  Output: The full form of t1-t2 is difftime(t1, t2, units='days')
+
+- Class: cmd_question
+  Output: Let's open the help section for difftime.
+  CorrectAnswer: ?difftime
+  AnswerTests: omnitest(correctVal=?difftime)
+  Hint: Just type ?difftime.
+  
+- Class: text
+  Output: |
+    You have many choices of units, such as "secs", "mins", "hours", "days", "weeks".
+
+- Class: cmd_question
+  Output: |
+    Let's recalculate t1-t2, now with unit "mins"
+  CorrectAnswer: difftime(t1, t2, units='mins')
+  AnswerTests: omnitest(correctExpr="difftime(t1, t2, units='mins')", correctVal=difftime(t1, t2, units='mins'))
+  Hint: You cannot use minus sign anymore. Use the proper `difftime` function instead.
+  
+- Class: text
+  Output: |
+    Another characteristic of 'date-time' and/or 'POSIXct' is that we can easily extract its elements, via the help of lubridate.
+    
+- Class: text
+  Output: |
+    Some functions are to help with these tasks, such as: second, minute, hour, day (day in month), wday (weekday in number, count from Sunday), weekdays (weekday in text), yday (day in year), week, month, year, and tz.
+ 
+- Class: script
+  Output: |
+    Write a function that will accept a day string, together with its order. Then return a list of its weekday in number, weekday in text, day in year, and day in month. 
+  AnswerTests: test.get_day_info()
+  Hint: You have to parse the date string first, after which try extracting required values. 
+  Script: get_day_info.R
+  
+- Class: cmd_question
+  Output: |
+    There are many more features implemented within lubridate package that have yet to be covered.
+    You can read the details here in its vignette.
+    
+    Type vignette('lubridate') to view the vignette.
+  CorrectAnswer: vignette('lubridate')
+  AnswerTests: omnitest(correctExpr="vignette('lubridate')")
+  Hint: NULL

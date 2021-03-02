@@ -1,0 +1,123 @@
+- Class: meta
+  Course: Data management and basic summaries in R
+  Lesson: Reading in data from SQLite file
+  Author: Trinh Dong, based on handout by Van Cao Thao and code by Marcel Wolbers, Ronald Geskus and Biostatistic group members, OUCRU-VN
+  Type: Standard
+  Organization: OUCRU-VN
+  Version: 2.4.3
+
+- Class: text
+  Output: |
+    Data can be stored under different format like Excel, SAS, Microsoft Access or SQLite file. 
+    
+    Data contain information and measurement of all observations, where rows are observations and columns are all the variables for a study. Database introduced here is the database file. 
+    This is the combination of many tables, similarly to the combination of many spreedsheets in Excel. 
+
+- Class: text
+  Output: |    
+    Database file can store under different extensions like .sqlite or .db. 
+    
+    However, the extensions of the database might not affect the connection of these database to R using the below coding. 
+    In this example, we will focus on using this database called example_csv.db to illustrate.
+  
+- Class: text
+  Output: |
+    Like Microsoft Access or Excel, there will be available softwares or webpages that can load SQLite file. 
+    
+    This free webpage <http://sqliteviewer.flowsoft7.com/> can help you to have a glance at the data without using R. 
+    
+    Besides, you can easily find other free webpage like <http://inloop.github.io/sqlite-viewer/>. 
+    
+- Class: mult_question
+  Output: Do you want to visit one of them?
+  AnswerChoices: http://sqliteviewer.flowsoft7.com/; http://inloop.github.io/sqlite-viewer/; Skip
+  CorrectAnswer: NULL
+  AnswerTests: site_visit()
+  Hint: Want to visit another?
+    
+- Class: text
+  Output: However, to use the data and do data analysis, you can input this SQLite file to R using "RSQLite" package.
+
+- Class: cmd_question
+  Output: First install the `RSQLite` package. Type installed() if it has already been installed.
+  CorrectAnswer: install.packages('RSQLite')
+  AnswerTests: check.package('RSQLite')
+  Hint: Use the function install.packages() with the relevant package name.
+  
+- Class: cmd_question
+  Output: Now import the aformentioned library
+  CorrectAnswer: library(RSQLite)
+  AnswerTests: any_of_exprs('library(RSQLite)', 'require(RSQLite)', 'library("RSQLite")', 'require("RSQLite")')
+  Hint: Use the function library() or require() with the relevant package name.
+
+- Class: cmd_question
+  Output: |
+    Our database is named "example_csv.db", we have to connect this to R. 
+    
+     `dbConnect` is used to connect the database file to the RSQLite driver.
+     
+    We also have to tell R to use driver "SQLite" via the parameter `drv = dbDriver("SQLite")`. 
+    
+    After that, assign the database filename within the second parameter: `dbname`.
+    
+    Finally, assign all to a variable named "con".
+  CorrectAnswer: con <- dbConnect(drv=dbDriver("SQLite"), dbname="example_csv.db" )
+  AnswerTests: omnitest(correctExpr='con <- dbConnect(drv=dbDriver("SQLite"), dbname="example_csv.db" )')
+  Hint: Thing should turn out like this":" con <- dbConnect(drv=dbDriver("something_should_be_here"), dbname="here_too" )'
+
+- Class: cmd_question
+  Output: Let's see what we have got. Use the function `dbListTables` with the connection `con` that we have just create.
+  CorrectAnswer: dbListTables(con)
+  AnswerTests: omnitest(correctExpr='dbListTables(con)', correctVal=c("ae","base","drug1"))
+  Hint: "Make sure you wrote something like this dbListTables(something_is_here)"
+  
+- Class: mult_question
+  Output: What did you `NOT` see within the results?
+  AnswerChoices: ae;base;drug2;
+  CorrectAnswer: drug2
+  AnswerTests: omnitest(correctVal= 'drug2')
+  Hint: Look at the dbListTables above.
+
+- Class: text
+  Output: |
+    From the connection to the database file, all related tables needed for analysis can be extracted, exactly what you are seeing above.
+    
+    Together with the use of `tidyverse` package, one can select any table from the connection by using the command `dbGetQuery` with `con` is the object that connect to SQLite file. 
+
+- Class: text
+  Output: |
+    The `dbGetQuery` function requires some knowledge with SQL language. 
+    
+    `SELECT` "<some_columns or * for select all>" `FROM` "<some_tables>" would do.
+    
+    For example, if you want to import the whole table_A via "connection", the command should be like this: dbGetQuery(connection, "SELECT * FROM table_A")
+
+- Class: cmd_question
+  Output: Now let's import table `base` from the SQLite database via our `con` connection. Don't forget to assign the result to variable `base`. 
+  CorrectAnswer: base <- dbGetQuery(con, "SELECT * FROM base")
+  AnswerTests: omnitest(correctExpr='base <- dbGetQuery(con, "SELECT * FROM base")')
+  Hint: Let's look at the previous step. The command should be like this":" base <- dbGetQuery(some_connection, \"some SQL Command\")
+
+- Class: cmd_question
+  Output: Do the same with `ae` table.
+  CorrectAnswer: ae <- dbGetQuery(con, "SELECT * FROM ae")
+  AnswerTests: omnitest(correctExpr='ae <- dbGetQuery(con, "SELECT * FROM ae")',)
+  Hint: Replace all "base" with "ae"
+  
+- Class: cmd_question
+  Output: Do the same with `drug1` table.
+  CorrectAnswer: drug1 <- dbGetQuery(con, "SELECT * FROM drug1")
+  AnswerTests: omnitest(correctExpr='drug1 <- dbGetQuery(con, "SELECT * FROM drug1")')
+  Hint: Replace all "base" with "drug1"
+
+- Class: cmd_question
+  Output: |
+    Now that everything is done. To avoid conflict and memory problem, it's time to set free of our database, in another world, to disconnect `con`. 
+    
+    The function to do that in `RSQLite` is dbDisconnect(some_connection)
+  CorrectAnswer: dbDisconnect(con)
+  AnswerTests: omnitest(correctExpr='dbDisconnect(con)')
+  Hint: The syntax is, once again, dbDisconnect(some_connection), guess what should be replace with `con`?
+
+- Class: text
+  Output: Now that we have finish importing the data from SQLite files. Congratulation.
