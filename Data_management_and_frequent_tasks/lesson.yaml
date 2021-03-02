@@ -604,21 +604,14 @@
   Output: If you use `head()`, you might notice that `time`, albeit numbers, the test `times` are treated as `chr`, which stands for `character()` type.
 
 - Class: text
-  Output: Concretely, this can be convert later in a subsequent step. However, a short hand to acquire this is to use `names_ptypes`
-
-- Class: text
   Output: |
-    `names_ptypes` accepts a list of empty vectors whose names match the title of the new "name" column, in this case, "time".
-  
-- Class: text
-  Output: |
-    "Empty vectors" are created using conventional constructor functions, such as `integer()`, `numeric()`, `character()`, and `factor()`.
+    You have to use `mutate` to change the type of `time` to integer (extra hint: the function to do that is `as.integer`).  
   
 - Class: cmd_question
-  Output:  Re-apply the `pivot_longer()` function, now with both `names_prefix` and `names_ptypes`. Name it `Data.long`
-  CorrectAnswer: Data.long <- Data.wide %>% pivot_longer(cols = c(bldwcc.1, bldwcc.2), names_to = "time", values_to = "bldwcc", names_prefix = "bldwcc.", names_ptypes = list(time=integer()))
-  AnswerTests: omnitest(correctVal = Data.wide %>% pivot_longer(cols = c(bldwcc.1, bldwcc.2), names_to = "time", values_to = "bldwcc", names_prefix = "bldwcc.", names_ptypes = list(time=integer()))); expr_creates_var('Data.long')
-  Hint: Re-run the recent function, now with names_ptypes = list(time = integer())
+  Output:  Re-apply the `pivot_longer()` function, with both `names_prefix` follow by a mutate. Name it `Data.long`
+  CorrectAnswer: Data.long <- Data.wide %>% pivot_longer(cols = c(bldwcc.1, bldwcc.2), names_to = "time", values_to = "bldwcc", names_prefix = "bldwcc.") %>% mutate(time = as.integer(time))
+  AnswerTests: omnitest(correctVal = Data.wide %>% pivot_longer(cols = c(bldwcc.1, bldwcc.2), names_to = "time", values_to = "bldwcc", names_prefix = "bldwcc.") %>% mutate(time = as.integer(time))); expr_creates_var('Data.long')
+  Hint: Re-run the recent function, now with %>% mutate(time = as.integer(time))
   
 - Class: cmd_question
   Output: Let's witness what was born using `head` or `View`
@@ -649,11 +642,11 @@
     
     2. names_from: a direct opposition to `names_to`. Values in this column are to become column names of the new table.
     
-    3. values_from: a direct oppposition to `values_to`. Values in this column are to be spreaded into different columns in the new table, depending on the names.
+    3. values_from: a direct opposition to `values_to`. Values in this column are to be spread into different columns in the new table, depending on the names.
 
 - Class: text
   Output: |
-    Similarily, this function also support `names_prefix`, which have a reversed effect in comparision to `pivot_longer`'s counterpart.
+    Similarly, this function also support `names_prefix`, which have a reversed effect in comparison to `pivot_longer`'s counterpart.
     
 - Class: cmd_question
   Output: |
@@ -676,4 +669,3 @@
 - Class: text
   Output: |
     That's basically all we have to learn about data transformation. Let's move to the final part, namely "Dealing with date/time data". 
-
