@@ -11,8 +11,15 @@ An internal course for new-comer to develop fundamental skills in Data managemen
 install.packages(c('swirl', 'swirlify'))
 ```
 
-- Build course from source
+- Install from github
+
+```r
+swirl::install_course_github("oucru-biostats", "Data_management_and_basic_summaries_in_R", branch = "main")
+```
+
+- **Or** Build course from source
 
 ```r
 swirlify::pack_course()
 ```
+
