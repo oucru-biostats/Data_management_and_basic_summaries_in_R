@@ -1,4 +1,4 @@
-# OUCRU internal swirl course of Basic Biostatistics
+# OUCRU internal swirl course of Basic Data Management
 
 ## Overview
 
